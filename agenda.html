@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Today's Agenda</title>
+
+  <!-- ============================================================
+    GOOGLE FONT — matches Classroomscreen's clean sans-serif look
+  ============================================================ -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       BASE RESET & LAYOUT
+       Sets up the dark background and centers content vertically
+    ============================================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #1b2133;   /* dark navy — matches Classroomscreen dark theme */
+      color: #ffffff;
+      font-family: 'Nunito', 'Verdana', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 28px 36px;          /* <-- ADJUST: outer padding around entire widget */
+    }
+
+    /* ============================================================
+       MAIN CARD CONTAINER
+       Controls width and internal spacing of the whole agenda block
+    ============================================================ */
+    .agenda-card {
+      width: 100%;
+      max-width: 820px;
+    }
+
+    /* ============================================================
+       TITLE — "Today's Agenda"
+    ============================================================ */
+    .agenda-title {
+      font-size: 2.4rem;            /* <-- ADJUST: main title size */
+      font-weight: 800;
+      color: #4dd9ec;               /* cyan accent */
+      text-align: center;
+      margin-bottom: 4px;           /* <-- ADJUST: gap below title */
+      letter-spacing: 0.02em;
+    }
+
+    /* ============================================================
+       SUBTITLE — e.g. "U5 Argument Writing"
+    ============================================================ */
+    .agenda-subtitle {
+      font-size: 1.7rem;            /* <-- ADJUST: subtitle size */
+      font-weight: 700;
+      color: #ffffff;
+      text-align: center;
+      margin-bottom: 20px;          /* <-- ADJUST: gap below subtitle */
+    }
+
+    /* ============================================================
+       DIVIDER LINE — thin separator under subtitle
+    ============================================================ */
+    .agenda-divider {
+      border: none;
+      border-top: 2px solid rgba(255, 255, 255, 0.15);
+      margin-bottom: 20px;          /* <-- ADJUST: gap below divider */
+    }
+
+    /* ============================================================
+       SECTION BLOCK — each top-level agenda item (e.g., "Today:", "Discussion")
+       margin-bottom controls vertical spacing between sections
+    ============================================================ */
+    .agenda-section {
+      margin-bottom: 18px;          /* <-- ADJUST: space between major sections */
+    }
+
+    /* ============================================================
+       SECTION LABEL ROW — the "Today: [highlighted text]" line
+    ============================================================ */
+    .section-label {
+      font-size: 1.25rem;           /* <-- ADJUST: label font size */
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 10px;          /* <-- ADJUST: gap between label and its bullets */
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;                     /* <-- ADJUST: gap between label parts */
+    }
+
+    /* ============================================================
+       HIGHLIGHTED TEXT CHIPS
+       .highlight-blue  → blue background chip
+       .highlight-yellow → yellow background chip
+    ============================================================ */
+    .highlight-blue {
+      background-color: #4a9eff;
+      color: #ffffff;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .highlight-yellow {
+      background-color: #f5c842;
+      color: #1b2133;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    /* Section header with its own highlight background (e.g., "Discussion") */
+    .section-header-highlight {
+      display: inline-block;
+      background-color: #4a9eff;
+      color: #ffffff;
+      padding: 2px 12px;
+      border-radius: 4px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    /* ============================================================
+       BULLET LIST — top-level bullets under a section
+    ============================================================ */
+    .bullet-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .bullet-list > li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;                     /* <-- ADJUST: gap between bullet dot and text */
+      font-size: 1.1rem;            /* <-- ADJUST: bullet text size */
+      font-weight: 600;
+      line-height: 1.45;
+      margin-bottom: 8px;           /* <-- ADJUST: space between top-level bullets */
+      padding-left: 4px;
+    }
+
+    /* The bullet dot character */
+    .bullet-list > li::before {
+      content: "•";
+      color: #ffffff;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ============================================================
+       SUB-BULLET LIST — nested bullets
+    ============================================================ */
+    .sub-bullet-list {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 6px;              /* <-- ADJUST: gap above sub-bullet block */
+      width: 100%;
+    }
+
+    .sub-bullet-list > li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 1rem;              /* <-- ADJUST: sub-bullet text size */
+      font-weight: 400;
+      line-height: 1.45;
+      margin-bottom: 6px;           /* <-- ADJUST: space between sub-bullets */
+      padding-left: 20px;           /* <-- ADJUST: left indent for sub-bullets */
+    }
+
+    .sub-bullet-list > li::before {
+      content: "•";
+      color: rgba(255, 255, 255, 0.6);  /* dimmer dot for sub-bullets */
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* Bold text within bullets — for "Reader:" "Writer:" labels */
+    .bullet-bold {
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+<div class="agenda-card" id="agenda-root">
+  <!-- JavaScript builds the agenda here from the config below -->
+</div>
+
+<script>
+  /* ============================================================
+     ✏️  DAILY EDIT ZONE — only change things inside this block
+     
+     STRUCTURE:
+       title      → top cyan heading
+       subtitle   → white subheading (unit/topic)
+       sections   → array of agenda sections. Each section has:
+         type: "today" | "header" | "bullets-only"
+         label:    bold prefix text (e.g. "Today:")
+         parts:    array of { text, style } where style is
+                   "plain" | "highlight-blue" | "highlight-yellow"
+         subLabel: optional text line below the label parts
+                   (e.g. "Leave comments about:")
+         bullets:  top-level bullet items. Each bullet is either:
+                   - a plain string  → renders as simple bullet
+                   - { text, subs }  → renders bullet with sub-bullets
+                     subs is an array of strings or
+                     { html } objects for bold formatting
+  ============================================================ */
+  const AGENDA = {
+    title: "Today's Agenda",
+    subtitle: "U5 Argument Writing",
+    sections: [
+      {
+        type: "today",
+        label: "Today:",
+        parts: [
+          { text: "Finish Peer Review", style: "highlight-blue" },
+          { text: "(see Canvas)", style: "highlight-yellow" }
+        ],
+        subLabel: "Leave comments about:",
+        bullets: [
+          {
+            text: "counterarguments: steelman or strawman?"
+          },
+          {
+            text: "evidence with a thin or missing explanation"
+          },
+          {
+            text: "line of reasoning: does the logic break or jump?"
+          },
+          {
+            text: "something that is genuinely working: be specific, not just \"good job\""
+          }
+        ]
+      },
+      {
+        type: "header",
+        label: "Discussion",
+        labelStyle: "highlight-blue",
+        bullets: [
+          { html: "<span class='bullet-bold'>Reader:</span> explain comments" },
+          { html: "<span class='bullet-bold'>Writer:</span> listen, take notes" }
+        ]
+      }
+    ]
+  };
+  /* ============================================================
+     END DAILY EDIT ZONE — do not edit below this line
+  ============================================================ */
+
+
+  /* ── Renderer ─────────────────────────────────────────────── */
+  function buildAgenda(config) {
+    const root = document.getElementById('agenda-root');
+
+    // Title
+    const h1 = document.createElement('h1');
+    h1.className = 'agenda-title';
+    h1.textContent = config.title;
+    root.appendChild(h1);
+
+    // Subtitle
+    if (config.subtitle) {
+      const sub = document.createElement('div');
+      sub.className = 'agenda-subtitle';
+      sub.textContent = config.subtitle;
+      root.appendChild(sub);
+    }
+
+    // Divider
+    const hr = document.createElement('hr');
+    hr.className = 'agenda-divider';
+    root.appendChild(hr);
+
+    // Sections
+    config.sections.forEach(section => {
+      const sectionDiv = document.createElement('div');
+      sectionDiv.className = 'agenda-section';
+
+      if (section.type === 'today') {
+        // "Today: [chips]" row
+        const labelRow = document.createElement('div');
+        labelRow.className = 'section-label';
+
+        const labelSpan = document.createElement('span');
+        labelSpan.textContent = section.label + ' ';
+        labelRow.appendChild(labelSpan);
+
+        section.parts.forEach(part => {
+          const chip = document.createElement('span');
+          chip.className = part.style !== 'plain' ? part.style : '';
+          chip.textContent = part.text;
+          labelRow.appendChild(chip);
+        });
+
+        sectionDiv.appendChild(labelRow);
+
+        // Optional sub-label ("Leave comments about:")
+        if (section.subLabel) {
+          const subLabelEl = document.createElement('div');
+          subLabelEl.className = 'section-label';
+          subLabelEl.style.fontWeight = '700';
+          subLabelEl.style.marginBottom = '8px';
+          subLabelEl.textContent = section.subLabel;
+          sectionDiv.appendChild(subLabelEl);
+        }
+      }
+
+      if (section.type === 'header') {
+        // Highlighted section header (e.g., "Discussion")
+        const headerEl = document.createElement('div');
+        headerEl.className = 'section-header-highlight';
+        headerEl.textContent = section.label;
+        sectionDiv.appendChild(headerEl);
+      }
+
+      // Bullets
+      if (section.bullets && section.bullets.length > 0) {
+        const ul = document.createElement('ul');
+        ul.className = 'bullet-list';
+
+        section.bullets.forEach(bullet => {
+          const li = document.createElement('li');
+
+          if (typeof bullet === 'string') {
+            // Plain string bullet
+            li.appendChild(document.createTextNode(bullet));
+
+          } else if (bullet.html) {
+            // Bullet with inline HTML (bold labels)
+            const span = document.createElement('span');
+            span.innerHTML = bullet.html;
+            li.appendChild(span);
+
+          } else if (bullet.text) {
+            // Bullet with optional sub-bullets
+            const textNode = document.createTextNode(bullet.text);
+            li.appendChild(textNode);
+
+            if (bullet.subs && bullet.subs.length > 0) {
+              const subUl = document.createElement('ul');
+              subUl.className = 'sub-bullet-list';
+
+              bullet.subs.forEach(sub => {
+                const subLi = document.createElement('li');
+                if (typeof sub === 'string') {
+                  subLi.textContent = sub;
+                } else if (sub.html) {
+                  subLi.innerHTML = sub.html;
+                }
+                subUl.appendChild(subLi);
+              });
+
+              li.appendChild(subUl);
+            }
+          }
+
+          ul.appendChild(li);
+        });
+
+        sectionDiv.appendChild(ul);
+      }
+
+      root.appendChild(sectionDiv);
+    });
+  }
+
+  buildAgenda(AGENDA);
+</script>
+
+</body>
+</html>
